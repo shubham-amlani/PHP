@@ -107,13 +107,13 @@
       </div>
     </nav><?php
 
-    if(isset($_GET['success']) && $_GET['success']==1){
+    if(isset($_GET['insertSuccess']) && $_GET['insertSuccess']==1){
       echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
       <strong>Success!</strong> Note added to the notes.
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>';
     }
-    if(isset($_GET['success']) && $_GET['success']==0){
+    if(isset($_GET['insertSuccess']) && $_GET['insertSuccess']==0){
       echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
       <strong>Sorry!</strong> Note cannot be added due to some technical issue.
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -168,36 +168,40 @@
     }
 
     if(isset($_GET['delete']) && $_GET['delete']==1){
-      $sno_delete = $_POST['snoDelete'];
-      $sql = "DELETE FROM `notes` WHERE `notes`.`sno`='$sno_delete'";
-      $result = mysqli_query($conn, $sql);
-      if($result){
-        header('Location: notes.php?deleteSuccess=1');
-      }
-      else{
-        header('Location: notes.php?deleteSuccess=0');
+      if($_SERVER['REQUEST_METHOD']=='POST'){
+        $sno_delete = $_POST['snoDelete'];
+        $sql = "DELETE FROM `notes` WHERE `notes`.`sno`='$sno_delete'";
+        $result = mysqli_query($conn, $sql);
+        if($result){
+          header('Location: notes.php?deleteSuccess=1');
+        }
+        else{
+          header('Location: notes.php?deleteSuccess=0');
+        }
       }
     }
 
+    if(isset($_GET['insert']) && $_GET['insert']==1){
       if($_SERVER['REQUEST_METHOD']=='POST'){
       $note_title = $_POST['note-title'];
       $note_description = $_POST['note-description'];
       $sql = "INSERT INTO `notes` (`sno`, `title`, `description`, `tstamp`) VALUES (NULL, '$note_title', '$note_description', current_timestamp())";
       $result = mysqli_query($conn, $sql);
       if($result){
-        header('Location: notes.php?success=1');
+        header('Location: notes.php?insertSuccess=1');
       }
       else{
-        header('Location: notes.php?success=0');
+        header('Location: notes.php?insertSuccess=0');
       }
     }
+  }
     ?>
 <!-- Delete modal -->
 <div class="modal" tabindex="-1" id="deleteModal">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Modal title</h5>
+        <h5 class="modal-title">Are you sure you want to delete this note?</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -237,7 +241,7 @@
 
     <div class="container my-4">
       <h2>Add a note</h2>
-      <form action="index.php" method="post">
+      <form action="index.php?insert=1" method="post">
         <div class="mb-3">
           <label for="note-title" class="form-label">Note Title</label>
           <input
